@@ -5,7 +5,7 @@ select*from hr;
 -- CHANGE THE FORMAT OF VALUES PRESENT IN A DATE COLUMN AND ALSO CONVERT STR/TEXT FORMAT DATE TO DATE FORMAT
 UPDATE hr
 SET birthdate= CASE
-				WHEN birthdate LIKE '%/%' THEN date_format(str_to_date(birthdate,'%m/%d/%Y'),'%Y-%m-%d')
+		WHEN birthdate LIKE '%/%' THEN date_format(str_to_date(birthdate,'%m/%d/%Y'),'%Y-%m-%d')
                 WHEN birthdate LIKE '%-%' THEN date_format(str_to_date(birthdate,'%m-%d-%Y'),'%Y-%m-%d')
                 ELSE NULL
                 END;
@@ -18,7 +18,7 @@ MODIFY COLUMN birthdate date;
 -- CHANGE THE FORMAT OF THE VALUES PRESENT IN THE HIRE_DATE COLUMN AND ALSO CONVERT STR/TEXT FORMAT TO DATE FORMAT
 UPDATE hr
 SET hire_date= CASE
-				WHEN hire_date LIKE '%/%' THEN DATE_FORMAT(STR_TO_DATE(hire_date,'%m/%d/%Y'),'%Y-%m-%d')
+		WHEN hire_date LIKE '%/%' THEN DATE_FORMAT(STR_TO_DATE(hire_date,'%m/%d/%Y'),'%Y-%m-%d')
                 ELSE NULL
                 END;
                 
@@ -45,6 +45,7 @@ WHERE termdate = '';
 UPDATE hr
 SET Age= timestampdiff(Year,birthdate, curdate());
 -----------------------------------------------------------------------------------------------------------
+################################## -- DATA ANALYSIS -- #########################################
 -- 1. Max and Min age 
 SELECT MAX(Age), MIN(Age) 
 FROM hr;
@@ -141,13 +142,15 @@ ORDER BY year asc;
         
 	
 -- memory wise less expensive
-WITH emp_change AS ( SELECT YEAR(hire_date) AS year, COUNT(*) hire_no,
-							SUM(CASE
-									WHEN termdate IS NOT NULL AND termdate<=curdate() THEN 1
-                                    END) AS termination_no
-					FROM hr
-                    GROUP BY year
-                    ORDER BY year)
+WITH emp_change AS ( SELECT 
+			YEAR(hire_date) AS year, 
+			COUNT(*) hire_no,
+			SUM(CASE
+				WHEN termdate IS NOT NULL AND termdate<=curdate() THEN 1
+                                END) AS termination_no
+				FROM hr
+                    		GROUP BY year
+                    		ORDER BY year)
                     
 SELECT year,hire_no,termination_no, 
 			(hire_no-termination_no) AS Net_emp_change,
